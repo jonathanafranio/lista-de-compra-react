@@ -5,7 +5,9 @@ Antes tinha feito esse mesma lista em Vue (https://github.com/jonathanafranio/li
 
 Nela, você nao precisa mais gastar papel escrevendo sua lista do que precisa compra no mercado.
 
-Link para teste: http://jonathanafranio.surge.sh/
+Link para teste: http://lista-de-compra-react.surge.sh/
+
+
 In the project directory, you can run:
 
 ### `npm start`
