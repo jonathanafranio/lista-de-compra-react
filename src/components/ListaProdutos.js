@@ -28,12 +28,14 @@ export default class ListaProdutos extends Component {
 
         this.state = {
             newProduct: '',
+            newQtd: 1,
             products: products,
             totalprecos: totalprecos,
             totalvalor: totalvalor,
         };
 
         this.productChange = this.productChange.bind(this);
+        this.qtdChange = this.qtdChange.bind(this);
         this.addProduct = this.addProduct.bind(this);
 
         this.incluirPreco = this.incluirPreco.bind(this);
@@ -44,12 +46,16 @@ export default class ListaProdutos extends Component {
         this.setState({ newProduct : event.target.value });
     }
 
+    qtdChange(event) {
+        this.setState({ newQtd: event.target.value });
+    }
+
     addProduct(event) {
         event.preventDefault();
 
         let newProd = {
             nome: this.state.newProduct,
-            quantidade: document.querySelector('#item-quantidade').value,
+            quantidade: this.state.newQtd,
             preco: 0,
             valortotal: 0
         };
@@ -128,7 +134,7 @@ export default class ListaProdutos extends Component {
                     </div>
                     <div className="mx-3 sm-2 ph-2 form-include__box">
                         <label className="form-include__label" htmlFor="item-quantidade">Quantidade:</label>
-                        <input type="number" id="item-quantidade" name="item-quantidade" min="1" required />
+                        <input type="number" id="item-quantidade" name="item-quantidade" min="1" onChange={ this.qtdChange } value={ this.state.newQtd } required />
                     </div>
                     <div className="mx-3 sm-6 ph-2 form-include__box">
                         <button type="submit">Adicionar</button>
