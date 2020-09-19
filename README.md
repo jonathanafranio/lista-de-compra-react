@@ -1,7 +1,11 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Lista de compra React
 
-## Available Scripts
+Uma lista TO DO em React para fazer sua lista de compras, e calcular preço de cada item.
+Antes tinha feito esse mesma lista em Vue (https://github.com/jonathanafranio/lista-de-compra-vue), agora fiz em React.js.
 
+Nela, você nao precisa mais gastar papel escrevendo sua lista do que precisa compra no mercado.
+
+Link para teste: http://jonathanafranio.surge.sh/
 In the project directory, you can run:
 
 ### `npm start`
