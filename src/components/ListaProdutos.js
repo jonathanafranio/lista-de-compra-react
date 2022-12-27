@@ -6,7 +6,7 @@ const ListaProdutos = (props) => {
     const [newProduct, setNewProduct ] = useState('')
     const [newQtd, setNewQtd] = useState(1)
     const [products, setProducts] = useState( all_products )
-    const [totalprecos, setTotalprecos] = useState( all_products.map((prod) => +prod.valortotal)  )
+    const [totalprecos, setTotalprecos] = useState( products.map((prod) => +prod.valortotal)  )
     const [totalvalor, setTotalvalor] = useState( localStorage.getItem('totalvalor') ? localStorage.getItem('totalvalor') : 0 )
 
     const addProduct = (event) => {
@@ -22,14 +22,15 @@ const ListaProdutos = (props) => {
         const product_list = products.concat(newProd)
         setProducts(product_list)
         setNewProduct('')
+        setNewQtd(1)
         
         localStorage.setItem( 'productsList', JSON.stringify(product_list) );
     }
 
     const incluirPreco = (event) => {
-        let thisRel = event.target.getAttribute('rel');
-        let precoUnitario = event.target.value.replace(',','.');
-        let precoTotal = (precoUnitario * products[thisRel].quantidade).toFixed(2);
+        const thisRel = event.target.getAttribute('rel');
+        const precoUnitario = event.target.value.replace(',','.');
+        const precoTotal = (precoUnitario * products[thisRel].quantidade).toFixed(2);
 
         let productArray = products;
         productArray[thisRel].preco = precoUnitario;
@@ -47,16 +48,15 @@ const ListaProdutos = (props) => {
 
     const removeProduct = (event) => {
         event.preventDefault();
-        const index = event.target.value;
-        const productsArr = products.length > 1 ? products.splice(index, 1) : []
-        const totalprecosArr = totalprecos.length > 1 ? totalprecos.splice(index, 1) : []
-        console.log({ products, index, productsArr, totalprecosArr, totalprecos })
-        
-        setProducts( productsArr )
+        const index = +event.currentTarget.value;
+        let product_removed = products
+            product_removed.splice(index, 1)
+        let totalprecosArr = totalprecos.length > 1 ? totalprecos.splice(index, 1) : []
+
+        setProducts( product_removed )
         setTotalprecos( totalprecosArr )
         setTotalvalor( totalprecosArr.reduce((total,num) => total + num, 0).toFixed(2) )
-        
-        productsArr.length ? localStorage.setItem('productsList', JSON.stringify(productsArr)) : localStorage.clear();
+        product_removed.length ? localStorage.setItem('productsList', JSON.stringify(product_removed)) : localStorage.clear();
     }
 
 
