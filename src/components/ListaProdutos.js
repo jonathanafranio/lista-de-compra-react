@@ -1,26 +1,8 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 
-let products,
-    totalprecos,
-    totalvalor;
-    
-if(localStorage.getItem('productsList') != null){
-    products = JSON.parse(localStorage.getItem('productsList'));
-} else {
-    products = [];
-}
-
-if(localStorage.getItem('productsList') != null) {
-    totalprecos = products.map((prod) => +prod.valortotal);
-} else {
-    totalprecos = [];
-}
-
-if(localStorage.getItem('totalvalor')!=null) {
-    totalvalor = localStorage.getItem('totalvalor');
-} else {
-    totalvalor = 0;
-}
+const products = localStorage.getItem('productsList') ? JSON.parse( localStorage.getItem('productsList') ) : []
+const totalprecos = products.map((prod) => +prod.valortotal) 
+const totalvalor = localStorage.getItem('totalvalor') ? localStorage.getItem('totalvalor') : 0
 
 export default class ListaProdutos extends Component {
     constructor() {
@@ -122,7 +104,7 @@ export default class ListaProdutos extends Component {
 
     render() {
         return (
-            <Fragment>
+            <>
                 <header className="header">
                     <h1>Lista de compras</h1>
                 </header>
@@ -199,7 +181,7 @@ export default class ListaProdutos extends Component {
                 <footer className="footer">
                     <p>Total da compra: <strong>R${ this.state.totalvalor }</strong></p>
                 </footer>
-            </Fragment>
+            </>
         )
     }
 }
