@@ -1,7 +1,5 @@
 import React from 'react';
-//import logo from './logo.svg';
 import mercado from './mercado.jpg';
-//import './App.css';
 import './sass/main.sass'
 
 import ListaProdutos from "./components/ListaProdutos"
@@ -13,10 +11,8 @@ function App() {
         <img src={mercado} alt="Lista de compras" />
       </div>
       <div className="container">        
-        <ListaProdutos></ListaProdutos>
+        <ListaProdutos />
       </div>
-
-
     </div>
   );
 }
