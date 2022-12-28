@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 
 const ModalDuplicidade = (props) => {
-    //const duplicidade = props.duplicidade ? props.duplicidade : null
-    //const alterQtd = props.alterQtd
     const { duplicidade, alterQtd, remove } = props
     const [ newQtd, setNewQtd ] = useState(1)
 
