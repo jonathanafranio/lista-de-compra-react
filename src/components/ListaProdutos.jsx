@@ -74,10 +74,13 @@ const ListaProdutos = (props) => {
         const newQtd = change.newQtd
         const currentArray = change.currentArray
         const qtdAtual = +products[currentArray].quantidade
+        const price = +products[currentArray].preco
+        const precoTotal = (price * newQtd).toFixed(2);
 
-        if( newQtd != qtdAtual ) {
+        if( newQtd !== qtdAtual ) {
             let alter_products = products
                 alter_products[currentArray].quantidade = newQtd
+                alter_products[currentArray].valortotal = precoTotal
             setProducts(alter_products)
         }
         setDuplicidade(null)
@@ -87,7 +90,6 @@ const ListaProdutos = (props) => {
     return (
         <>
             <IncludeItem hasProd={ hasProduct } />
-
             <hr />
 
             <ul className="list mx-12">
@@ -126,13 +128,13 @@ const ListaProdutos = (props) => {
                         </div>
                         
                         <div className="list__price-uni col mx-3 sm-2 ph-1">
-                            <input type="number" pattern="[0-9]+([,\.][0-2]+)?" name="price-product" placeholder="Valor (R$):" step="0.01" id={'price-'+index} rel={index} value={ product.preco } onChange={ incluirPreco } />
+                            <input type="number" pattern="[0-9]+([,\.][0-2]+)?" name="price-product" placeholder="Valor (R$):" step="0.01" id={'price-'+index} rel={index} value={ product.preco } onChange={  incluirPreco } />
                         </div>
                         
                         <div className="list__price-total col mx-3 sm-3 ph-1">{ product.valortotal }</div>
 
                         <div className="list__remve-product col mx-1 sm-1 ph-1">
-                            <button type="button" name="button" onClick={ e => removeProduct(index) } className="list__btn" value={ index }>
+                            <button type="button" name="button" onClick={ _ => removeProduct(index) } className="list__btn" value={ index }>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                                     <path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path>
                                 </svg>
