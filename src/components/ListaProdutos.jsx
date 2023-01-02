@@ -1,21 +1,64 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import IncludeItem from './IncludeItem'
 import ModalDuplicidade from './ModalDuplicidade'
+import OrderSelect from './OrderSelect'
 
 const all_products = localStorage.getItem('productsList') ? JSON.parse( localStorage.getItem('productsList') ) : []
 
 const ListaProdutos = (props) => {
     const [products, setProducts] = useState( all_products )
     const [totalprecos, setTotalprecos] = useState( products.map((prod) => +prod.valortotal)  )
-    const [totalvalor, setTotalvalor] = useState( localStorage.getItem('totalvalor') ? localStorage.getItem('totalvalor') : 0 )
+    const [totalvalor, setTotalvalor] = useState( totalprecos.reduce((total, num) => total + num) )
     const [duplicidade, setDuplicidade] = useState(null)
+    const [showOrder, setShowOrder] = useState(false)
+    const [order, setOrder] = useState("default")
+    const [showProductOrder, setShowProductOrder] = useState(products)
+
+    useEffect(() => {
+        const orderByNameAsc = (arrProd)  => {
+            const prodNameAsc = arrProd.sort((a, b) => {
+                const nameA = a.nome.toLowerCase();
+                const nameB = b.nome.toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+            return prodNameAsc;
+        }
+        const orderByNameDesc = (arrProd) => orderByNameAsc(arrProd).reverse();
+        const orderBypriceAsc = (arrProd) => arrProd.sort((a, b) => a.preco - b.preco);
+        const orderBypriceDesc = (arrProd) => orderBypriceAsc(arrProd).reverse();
+        const orderByQtdAsc = (arrProd) => arrProd.sort((a, b) => a.quantidade - b.quantidade);
+        const orderByQtdDesc = (arrProd) => orderByQtdAsc(arrProd).reverse();
+        const funcOrder = (arrProd) => {
+            switch (order) {
+                case "nameAsc":
+                    return orderByNameAsc(arrProd);
+                case "nameDesc":
+                    return orderByNameDesc(arrProd);
+                case "priceAsc":
+                    return orderBypriceAsc(arrProd);
+                case "priceDesc":
+                    return orderBypriceDesc(arrProd);
+                case "qtdAsc":
+                    return orderByQtdAsc(arrProd);
+                case "qtdDesc":
+                    return orderByQtdDesc(arrProd);
+                default:
+                    return arrProd;
+            }
+        }
+        products.length > 1 ? setShowOrder(true) : setShowOrder(false)
+        const return_prod = funcOrder(products);
+        console.log({ return_prod })
+        setShowProductOrder(return_prod)
+
+    }, [products, order, showProductOrder])
 
     const hasProduct = (obj_prod) => {
         if(!obj_prod) return
 
         const nameNewProd = obj_prod.nome.toLowerCase()
         const hastThisProd = products.findIndex((prod) => prod.nome.toLowerCase() === nameNewProd)
-        console.log({ duplicidade })
+        
         if (hastThisProd < 0) {
             addProduct( obj_prod )
         } else {
@@ -58,15 +101,16 @@ const ListaProdutos = (props) => {
     }
 
     const removeProduct = (index) => {
-        if(!index) return
-        let product_removed = products 
-            product_removed.splice(index, 1)
-        let totalprecosArr = totalprecos.length > 1 ? totalprecos.splice(index, 1) : []
+        if( typeof index !== "number" ) return
+        const name_removed = products[index].nome.toLowerCase()
+        const newList = products.filter( (p) => p.nome.toLowerCase() !== name_removed )
+        setProducts( newList )
 
-        setProducts( product_removed )
+        const totalprecosArr = newList.map( p => +p.valortotal)
+        
         setTotalprecos( totalprecosArr )
         setTotalvalor( totalprecosArr.reduce((total,num) => total + num, 0).toFixed(2) )
-        product_removed.length ? localStorage.setItem('productsList', JSON.stringify(product_removed)) : localStorage.clear();
+        newList.length ? localStorage.setItem('productsList', JSON.stringify(newList)) : localStorage.clear();
         setDuplicidade(null)
     }
 
@@ -82,6 +126,12 @@ const ListaProdutos = (props) => {
                 alter_products[currentArray].quantidade = newQtd
                 alter_products[currentArray].valortotal = precoTotal
             setProducts(alter_products)
+
+            const totalprecosArr = alter_products.map( p => +p.valortotal)
+        
+            setTotalprecos( totalprecosArr )
+            setTotalvalor( totalprecosArr.reduce((total,num) => total + num, 0).toFixed(2) )
+            alter_products.length ? localStorage.setItem('productsList', JSON.stringify(alter_products)) : localStorage.clear();
         }
         setDuplicidade(null)
     }
@@ -92,8 +142,14 @@ const ListaProdutos = (props) => {
             <IncludeItem hasProd={ hasProduct } />
             <hr />
 
+            { showOrder ? (<OrderSelect order={order} changeSelect={ setOrder } />) : (<></>) }
+
+            { showProductOrder.map( (product, index ) => (
+                <p key={index}>{ product.nome }</p>
+            ) ) }
+
             <ul className="list mx-12">
-                { products.length ? (
+                { showProductOrder.length ? (
                 <li className="list__prod list__title">
                     <strong className="list__name-prod mx-4">
                         Produto:
@@ -115,8 +171,9 @@ const ListaProdutos = (props) => {
                     <h3>Sua lista está vazia.</h3>
                 </li>
                 ) }
+                
 
-                { products.map( (product, index ) => (
+                { showProductOrder.map( (product, index ) => (
                     <li className="list__prod" id={`product-${index}`} key={index}>
                         <input type="checkbox" className="list__checkbox" id={index} />
                         <label className="list__name-prod list__label-prod mx-4 sm-5 ph-2" htmlFor={index}>

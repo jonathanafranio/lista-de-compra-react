@@ -78,8 +78,6 @@ const IncludeItem = (props) => {
         e.preventDefault()
         if( nome.trim() === "" ) return
 
-        console.log('oii', nome)
-
         const prodAdd = {
             nome: nome,
             quantidade: +quantidade,
