@@ -14,45 +14,6 @@ const ListaProdutos = (props) => {
     const [order, setOrder] = useState("default")
     const [showProductOrder, setShowProductOrder] = useState(products)
 
-    useEffect(() => {
-        const orderByNameAsc = (arrProd)  => {
-            const prodNameAsc = arrProd.sort((a, b) => {
-                const nameA = a.nome.toLowerCase();
-                const nameB = b.nome.toLowerCase();
-                return nameA.localeCompare(nameB);
-            });
-            return prodNameAsc;
-        }
-        const orderByNameDesc = (arrProd) => orderByNameAsc(arrProd).reverse();
-        const orderBypriceAsc = (arrProd) => arrProd.sort((a, b) => a.preco - b.preco);
-        const orderBypriceDesc = (arrProd) => orderBypriceAsc(arrProd).reverse();
-        const orderByQtdAsc = (arrProd) => arrProd.sort((a, b) => a.quantidade - b.quantidade);
-        const orderByQtdDesc = (arrProd) => orderByQtdAsc(arrProd).reverse();
-        const funcOrder = (arrProd) => {
-            switch (order) {
-                case "nameAsc":
-                    return orderByNameAsc(arrProd);
-                case "nameDesc":
-                    return orderByNameDesc(arrProd);
-                case "priceAsc":
-                    return orderBypriceAsc(arrProd);
-                case "priceDesc":
-                    return orderBypriceDesc(arrProd);
-                case "qtdAsc":
-                    return orderByQtdAsc(arrProd);
-                case "qtdDesc":
-                    return orderByQtdDesc(arrProd);
-                default:
-                    return arrProd;
-            }
-        }
-        products.length > 1 ? setShowOrder(true) : setShowOrder(false)
-        const return_prod = funcOrder(products);
-        console.log({ return_prod })
-        setShowProductOrder(return_prod)
-
-    }, [products, order, showProductOrder])
-
     const hasProduct = (obj_prod) => {
         if(!obj_prod) return
 
@@ -137,16 +98,53 @@ const ListaProdutos = (props) => {
     }
 
 
+    useEffect(() => {
+        const orderByNameAsc = (arrProd)  => {
+            const prodNameAsc = arrProd.sort((a, b) => {
+                const nameA = a.nome.toLowerCase();
+                const nameB = b.nome.toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+            return prodNameAsc;
+        }
+        const orderByNameDesc = (arrProd) => orderByNameAsc(arrProd).reverse();
+        const orderBypriceAsc = (arrProd) => arrProd.sort((a, b) => a.preco - b.preco);
+        const orderBypriceDesc = (arrProd) => orderBypriceAsc(arrProd).reverse();
+        const orderByQtdAsc = (arrProd) => arrProd.sort((a, b) => a.quantidade - b.quantidade);
+        const orderByQtdDesc = (arrProd) => orderByQtdAsc(arrProd).reverse();
+        const funcOrder = (arrProd) => {
+            switch (order) {
+                case "nameAsc":
+                    return orderByNameAsc(arrProd);
+                case "nameDesc":
+                    return orderByNameDesc(arrProd);
+                case "priceAsc":
+                    return orderBypriceAsc(arrProd);
+                case "priceDesc":
+                    return orderBypriceDesc(arrProd);
+                case "qtdAsc":
+                    return orderByQtdAsc(arrProd);
+                case "qtdDesc":
+                    return orderByQtdDesc(arrProd);
+                default:
+                    return arrProd;
+            }
+        }
+        products.length > 1 ? setShowOrder(true) : setShowOrder(false)
+        const return_prod = funcOrder(products);
+        setShowProductOrder(return_prod)
+    }, [products, order])
+
+
+
     return (
         <>
             <IncludeItem hasProd={ hasProduct } />
             <hr />
 
-            { showOrder ? (<OrderSelect order={order} changeSelect={ setOrder } />) : (<></>) }
+            <p>Ordenacao: { order }</p>
 
-            { showProductOrder.map( (product, index ) => (
-                <p key={index}>{ product.nome }</p>
-            ) ) }
+            { showOrder ? (<OrderSelect order={order} changeSelect={ setOrder } />) : (<></>) }
 
             <ul className="list mx-12">
                 { showProductOrder.length ? (
@@ -172,7 +170,6 @@ const ListaProdutos = (props) => {
                 </li>
                 ) }
                 
-
                 { showProductOrder.map( (product, index ) => (
                     <li className="list__prod" id={`product-${index}`} key={index}>
                         <input type="checkbox" className="list__checkbox" id={index} />
