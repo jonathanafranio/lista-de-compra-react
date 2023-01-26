@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import IncludeItem from './IncludeItem'
 //import ModalDuplicidade from './ModalDuplicidade'
 import OrderSelect from './OrderSelect'
+import InputPrice from './InputPrice'
 
 const all_products = localStorage.getItem('productsList') ? JSON.parse( localStorage.getItem('productsList') ) : []
 
@@ -15,6 +16,7 @@ const ListaProdutos = (props) => {
     const [order, setOrder] = useState("default")
 
     useEffect(() => {
+        console.log('mudou')
         products.length > 1 ? setShowOrder(true) : setShowOrder(false)
     }, [products])
     
@@ -93,6 +95,25 @@ const ListaProdutos = (props) => {
         setProducts( return_prod )
     }
 
+    const incluirPreco = (idProd, newPrice) => {
+        if(!newPrice) return
+        if(!idProd) return
+
+        
+        let productArray = products
+        const thisIndex = productArray.findIndex((prod) => prod.id === idProd)
+        let precoUnitario = +newPrice.toString().replace(',', '.')
+        const precoTotal = (precoUnitario * productArray[thisIndex].quantidade).toFixed(2)
+        
+        productArray[thisIndex].preco = precoUnitario;
+        productArray[thisIndex].valortotal = +precoTotal;
+        
+        setProducts(productArray)
+        console.log(`caralho ${newPrice} - ${idProd}`)
+        console.log({ productArray, products })
+        localStorage.setItem('productsList', JSON.stringify(productArray));
+    }
+
     const removeProduct = (id) => {
         if(!id) return
         const newList = products.filter( (p) => p.id !== id )
@@ -104,6 +125,16 @@ const ListaProdutos = (props) => {
 
         newList.length ? localStorage.setItem('productsList', JSON.stringify(newList)) : localStorage.clear();
         setDuplicidade(null)
+    }
+
+    const totalItem = (id) => {
+        if(!id) return ''
+
+        const product = products.filter(p => p.id === id)
+        const quantidade = product[0].quantidade
+        const preco = product[0].preco ?? 0
+        const total = (preco * quantidade).toFixed(2)
+        return total
     }
 
 
@@ -151,9 +182,7 @@ const ListaProdutos = (props) => {
                         </div>
                         
                         <div className="list__price-uni col mx-3 sm-2 ph-1">
-                            { /*
-                            <input type="number" pattern="[0-9]+([,\.][0-2]+)?" name="price-product" placeholder="Valor (R$):" step="0.01" id={'price-'+index} rel={index} value={ product.preco } onChange={  incluirPreco } />
-                            */ }
+                            <InputPrice product={ product } incluirPreco={ incluirPreco } />
                         </div>
                         
                         <div className="list__price-total col mx-3 sm-3 ph-1">{ product.valortotal }</div>
@@ -169,34 +198,6 @@ const ListaProdutos = (props) => {
                     </li>
                 ) ) }
 
-
-                { /* products.map( (product, index ) => (
-                    <li className="list__prod" id={`product-${index}`} key={index}>
-                        <input type="checkbox" className="list__checkbox" id={index} />
-                        <label className="list__name-prod list__label-prod mx-4 sm-5 ph-2" htmlFor={index}>
-                        { product.nome }
-                        </label>
-
-                        <div className="list__qtd-prod col mx-1 sm-1 ph-1">
-                            { product.quantidade }
-                        </div>
-                        
-                        <div className="list__price-uni col mx-3 sm-2 ph-1">
-                            <input type="number" pattern="[0-9]+([,\.][0-2]+)?" name="price-product" placeholder="Valor (R$):" step="0.01" id={'price-'+index} rel={index} value={ product.preco } onChange={  incluirPreco } />
-                        </div>
-                        
-                        <div className="list__price-total col mx-3 sm-3 ph-1">{ product.valortotal }</div>
-
-                        <div className="list__remve-product col mx-1 sm-1 ph-1">
-                            <button type="button" name="button" onClick={ _ => removeProduct(index) } className="list__btn" value={ index }>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                                    <path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                    </li>
-                ) ) */}
             </ul>
 
             <footer className="footer">
