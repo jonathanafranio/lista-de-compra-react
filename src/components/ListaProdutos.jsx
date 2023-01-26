@@ -7,12 +7,14 @@ const all_products = localStorage.getItem('productsList') ? JSON.parse( localSto
 
 const ListaProdutos = (props) => {
     const [products, setProducts] = useState( all_products )
-    const [totalprecos, setTotalprecos] = useState( products.map((prod) => +prod.valortotal)  )
-    const [totalvalor, setTotalvalor] = useState( totalprecos.reduce((total, num) => total + num) )
+    const [totalprecos, setTotalprecos] = useState( products ? products.map((prod) => +prod.valortotal) : [] )
+    const [totalvalor, setTotalvalor] = useState( products.length > 0 ? totalprecos.reduce((total, num) => total + num) : 0 )
     const [duplicidade, setDuplicidade] = useState(null)
     const [showOrder, setShowOrder] = useState(false)
     const [order, setOrder] = useState("default")
     const [showProductOrder, setShowProductOrder] = useState(products)
+
+
 
     const hasProduct = (obj_prod) => {
         if(!obj_prod) return
@@ -97,8 +99,13 @@ const ListaProdutos = (props) => {
         setDuplicidade(null)
     }
 
-
     useEffect(() => {
+        products.length > 1 ? setShowOrder(true) : setShowOrder(false)
+    }, [products])
+
+    function changeOrder(newOrder) {
+        if(!newOrder) return
+        setOrder(newOrder)
         const orderByNameAsc = (arrProd)  => {
             const prodNameAsc = arrProd.sort((a, b) => {
                 const nameA = a.nome.toLowerCase();
@@ -113,7 +120,7 @@ const ListaProdutos = (props) => {
         const orderByQtdAsc = (arrProd) => arrProd.sort((a, b) => a.quantidade - b.quantidade);
         const orderByQtdDesc = (arrProd) => orderByQtdAsc(arrProd).reverse();
         const funcOrder = (arrProd) => {
-            switch (order) {
+            switch (newOrder) {
                 case "nameAsc":
                     return orderByNameAsc(arrProd);
                 case "nameDesc":
@@ -130,11 +137,10 @@ const ListaProdutos = (props) => {
                     return arrProd;
             }
         }
-        products.length > 1 ? setShowOrder(true) : setShowOrder(false)
+        
         const return_prod = funcOrder(products);
         setShowProductOrder(return_prod)
-    }, [products, order])
-
+    }
 
 
     return (
@@ -142,9 +148,8 @@ const ListaProdutos = (props) => {
             <IncludeItem hasProd={ hasProduct } />
             <hr />
 
-            <p>Ordenacao: { order }</p>
-
-            { showOrder ? (<OrderSelect order={order} changeSelect={ setOrder } />) : (<></>) }
+            { /*showOrder ? (<OrderSelect order={order} changeSelect={ setOrder } />) : (<></>) */ }
+            { showOrder ? (<OrderSelect order={order} changeSelect={ changeOrder } />) : false }
 
             <ul className="list mx-12">
                 { showProductOrder.length ? (
