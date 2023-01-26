@@ -40,7 +40,9 @@ const ListaProdutos = (props) => {
 
     const addProduct = (newProd) => {
         if( ! newProd ) return
-        const id_prod = products.length + 1
+        const id_maior = products.length ? products.map(p => p.id).reduce((a,b) => Math.max(a, b)) : 0
+        const id_prod = id_maior + 1
+        
         newProd.id = id_prod
 
         const product_list = products.concat(newProd)
@@ -50,7 +52,6 @@ const ListaProdutos = (props) => {
 
     const changeOrder = (newOrder) => {
         if(!newOrder) return
-        console.log(`Ordem alterada para ${newOrder}`)
         
         setOrder(newOrder)
 
@@ -90,7 +91,19 @@ const ListaProdutos = (props) => {
         const return_prod = funcOrder(products);
 
         setProducts( return_prod )
-        /*setShowProductOrder(return_prod)*/
+    }
+
+    const removeProduct = (id) => {
+        if(!id) return
+        const newList = products.filter( (p) => p.id !== id )
+        setProducts( newList )
+
+        //const totalprecosArr = newList.map( p => +p.valortotal)
+        //setTotalprecos( totalprecosArr )
+        //setTotalvalor( totalprecosArr.reduce((total,num) => total + num, 0).toFixed(2) )
+
+        newList.length ? localStorage.setItem('productsList', JSON.stringify(newList)) : localStorage.clear();
+        setDuplicidade(null)
     }
 
 
@@ -127,9 +140,9 @@ const ListaProdutos = (props) => {
                 
 
                 { products.map( (product, index ) => ( 
-                    <li className="list__prod" id={`product-${index}`} key={index}>
-                        <input type="checkbox" className="list__checkbox" id={index} />
-                        <label className="list__name-prod list__label-prod mx-4 sm-5 ph-2" htmlFor={index}>
+                    <li className="list__prod" id={`product-${product.id}`} key={product.id}>
+                        <input type="checkbox" className="list__checkbox" id={product.id} />
+                        <label className="list__name-prod list__label-prod mx-4 sm-5 ph-2" htmlFor={product.id}>
                         { product.nome }
                         </label>
 
@@ -146,13 +159,11 @@ const ListaProdutos = (props) => {
                         <div className="list__price-total col mx-3 sm-3 ph-1">{ product.valortotal }</div>
 
                         <div className="list__remve-product col mx-1 sm-1 ph-1">
-                            { /*
-                            <button type="button" name="button" onClick={ _ => removeProduct(index) } className="list__btn" value={ index }>
+                            <button type="button" name="button" onClick={ _ => removeProduct(product.id) } className="list__btn" value={ product.id }>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                                     <path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path>
                                 </svg>
-                            </button> 
-                            */ }
+                            </button>
                         </div>
 
                     </li>
