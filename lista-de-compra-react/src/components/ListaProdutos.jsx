@@ -2,22 +2,29 @@ import React, { useState, useEffect } from "react";
 import IncludeItem from './IncludeItem'
 //import ModalDuplicidade from './ModalDuplicidade'
 import OrderSelect from './OrderSelect'
-import InputPrice from './InputPrice'
+import Product from "./Product"
 
 const all_products = localStorage.getItem('productsList') ? JSON.parse( localStorage.getItem('productsList') ) : []
 
 const ListaProdutos = (props) => {
     const [products, setProducts] = useState( all_products )
-    const [totalprecos, setTotalprecos] = useState( products ? products.map((prod) => +prod.valortotal) : [] )
-    //const [totalvalor, setTotalvalor] = useState( products.length > 0 ? totalprecos.reduce((total, num) => total + num) : 0 )
-    const [totalvalor, setTotalvalor] = useState( 0 )
+    const [totalvalor, setTotalvalor] = useState( 'R$0,00' )
     const [duplicidade, setDuplicidade] = useState(null)
     const [showOrder, setShowOrder] = useState(false)
     const [order, setOrder] = useState("default")
 
     useEffect(() => {
-        console.log('mudou')
         products.length > 1 ? setShowOrder(true) : setShowOrder(false)
+
+        const produtctsValuesTotal = products.map( p => +p.valortotal )
+        const total = produtctsValuesTotal.reduce((total, num) => total + num)
+        const totalString = total.toLocaleString("pt-br", {
+            style: "currency",
+            currency: "BRL",
+        })
+
+        setTotalvalor(totalString)
+
     }, [products])
     
     const hasProduct = (obj_prod) => {
@@ -30,12 +37,15 @@ const ListaProdutos = (props) => {
             addProduct( obj_prod )
 
         } else {
-            /*const obj_duplicidade = {
+            const obj_duplicidade = {
                 currentArray: hastThisProd,
                 prodNome: products[hastThisProd].nome,
                 prodQtd: +products[hastThisProd].quantidade
             }
+            console.log({ duplicidade, obj_duplicidade })
             setDuplicidade( obj_duplicidade )
+            console.log({ duplicidade })
+            /*
             navigator.vibrate(400);*/
         }
     }
@@ -107,10 +117,8 @@ const ListaProdutos = (props) => {
         
         productArray[thisIndex].preco = precoUnitario;
         productArray[thisIndex].valortotal = +precoTotal;
-        
-        setProducts(productArray)
-        console.log(`caralho ${newPrice} - ${idProd}`)
         console.log({ productArray, products })
+        setProducts( productArray )
         localStorage.setItem('productsList', JSON.stringify(productArray));
     }
 
@@ -118,10 +126,6 @@ const ListaProdutos = (props) => {
         if(!id) return
         const newList = products.filter( (p) => p.id !== id )
         setProducts( newList )
-
-        //const totalprecosArr = newList.map( p => +p.valortotal)
-        //setTotalprecos( totalprecosArr )
-        //setTotalvalor( totalprecosArr.reduce((total,num) => total + num, 0).toFixed(2) )
 
         newList.length ? localStorage.setItem('productsList', JSON.stringify(newList)) : localStorage.clear();
         setDuplicidade(null)
@@ -170,38 +174,14 @@ const ListaProdutos = (props) => {
                 ) }
                 
 
-                { products.map( (product, index ) => ( 
-                    <li className="list__prod" id={`product-${product.id}`} key={product.id}>
-                        <input type="checkbox" className="list__checkbox" id={product.id} />
-                        <label className="list__name-prod list__label-prod mx-4 sm-5 ph-2" htmlFor={product.id}>
-                        { product.nome }
-                        </label>
-
-                        <div className="list__qtd-prod col mx-1 sm-1 ph-1">
-                            { product.quantidade }
-                        </div>
-                        
-                        <div className="list__price-uni col mx-3 sm-2 ph-1">
-                            <InputPrice product={ product } incluirPreco={ incluirPreco } />
-                        </div>
-                        
-                        <div className="list__price-total col mx-3 sm-3 ph-1">{ product.valortotal }</div>
-
-                        <div className="list__remve-product col mx-1 sm-1 ph-1">
-                            <button type="button" name="button" onClick={ _ => removeProduct(product.id) } className="list__btn" value={ product.id }>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                                    <path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                    </li>
+                { products.map( (product, index ) => (
+                    <Product product={ product } removeProduct={ removeProduct } incluirPreco={ incluirPreco } />
                 ) ) }
 
             </ul>
 
             <footer className="footer">
-                <p>Total da compra: <strong>R${ totalvalor }</strong></p>
+                <p>Total da compra: <strong>{ totalvalor }</strong></p>
             </footer>
             { /*duplicidade ? (
                 <ModalDuplicidade duplicidade={ duplicidade } alterQtd={ fecharModalDuplicidade } remove={ removeProduct } />
