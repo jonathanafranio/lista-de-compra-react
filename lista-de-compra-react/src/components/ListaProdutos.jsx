@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import IncludeItem from './IncludeItem'
-//import ModalDuplicidade from './ModalDuplicidade'
+import ModalDuplicidade from './ModalDuplicidade'
 import OrderSelect from './OrderSelect'
 import Product from "./Product"
 
@@ -13,9 +13,7 @@ const ListaProdutos = (props) => {
     const [showOrder, setShowOrder] = useState(false)
     const [order, setOrder] = useState("default")
 
-    useEffect(() => {
-        products.length > 1 ? setShowOrder(true) : setShowOrder(false)
-
+    const changeTotalValue = () => {
         const produtctsValuesTotal = products.map( p => +p.valortotal )
         const total = produtctsValuesTotal.reduce((total, num) => total + num)
         const totalString = total.toLocaleString("pt-br", {
@@ -24,6 +22,12 @@ const ListaProdutos = (props) => {
         })
 
         setTotalvalor(totalString)
+    }
+
+    useEffect(() => {
+        products.length > 1 ? setShowOrder(true) : setShowOrder(false)
+
+        changeTotalValue()
 
     }, [products])
     
@@ -42,11 +46,8 @@ const ListaProdutos = (props) => {
                 prodNome: products[hastThisProd].nome,
                 prodQtd: +products[hastThisProd].quantidade
             }
-            console.log({ duplicidade, obj_duplicidade })
             setDuplicidade( obj_duplicidade )
-            console.log({ duplicidade })
-            /*
-            navigator.vibrate(400);*/
+            navigator.vibrate(400);
         }
     }
 
@@ -117,8 +118,9 @@ const ListaProdutos = (props) => {
         
         productArray[thisIndex].preco = precoUnitario;
         productArray[thisIndex].valortotal = +precoTotal;
-        console.log({ productArray, products })
+        
         setProducts( productArray )
+        changeTotalValue()
         localStorage.setItem('productsList', JSON.stringify(productArray));
     }
 
@@ -131,14 +133,28 @@ const ListaProdutos = (props) => {
         setDuplicidade(null)
     }
 
-    const totalItem = (id) => {
-        if(!id) return ''
+    const fecharModalDuplicidade = (change) => {
+        const newQtd = change.newQtd
+        const currentArray = change.currentArray
+        const qtdAtual = +products[currentArray].quantidade
+        const price = +products[currentArray].preco
+        const precoTotal = (price * newQtd).toFixed(2);
 
-        const product = products.filter(p => p.id === id)
-        const quantidade = product[0].quantidade
-        const preco = product[0].preco ?? 0
-        const total = (preco * quantidade).toFixed(2)
-        return total
+        if( newQtd !== qtdAtual ) {
+            let alter_products = products
+                alter_products[currentArray].quantidade = newQtd
+                alter_products[currentArray].valortotal = precoTotal
+
+                console.log(alter_products[currentArray])
+            setProducts(alter_products)
+
+            const totalprecosArr = alter_products.map( p => +p.valortotal)
+        
+            alter_products.length ? localStorage.setItem('productsList', JSON.stringify(alter_products)) : localStorage.clear();
+
+            changeTotalValue()
+        }
+        setDuplicidade(null)
     }
 
 
@@ -183,9 +199,9 @@ const ListaProdutos = (props) => {
             <footer className="footer">
                 <p>Total da compra: <strong>{ totalvalor }</strong></p>
             </footer>
-            { /*duplicidade ? (
+            { duplicidade ? (
                 <ModalDuplicidade duplicidade={ duplicidade } alterQtd={ fecharModalDuplicidade } remove={ removeProduct } />
-            ) : false*/ }
+            ) : false }
         </>
     )
 
