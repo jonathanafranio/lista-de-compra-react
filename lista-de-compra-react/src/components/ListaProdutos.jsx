@@ -28,7 +28,7 @@ const ListaProdutos = (props) => {
         products.length > 1 ? setShowOrder(true) : setShowOrder(false)
 
         changeTotalValue()
-
+        // eslint-disable-next-line 
     }, [products])
     
     const hasProduct = (obj_prod) => {
@@ -148,8 +148,6 @@ const ListaProdutos = (props) => {
                 console.log(alter_products[currentArray])
             setProducts(alter_products)
 
-            const totalprecosArr = alter_products.map( p => +p.valortotal)
-        
             alter_products.length ? localStorage.setItem('productsList', JSON.stringify(alter_products)) : localStorage.clear();
 
             changeTotalValue()
