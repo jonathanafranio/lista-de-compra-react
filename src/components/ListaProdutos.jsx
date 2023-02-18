@@ -15,7 +15,7 @@ const ListaProdutos = (props) => {
 
     const changeTotalValue = () => {
         const produtctsValuesTotal = products.map( p => +p.valortotal )
-        const total = produtctsValuesTotal.reduce((total, num) => total + num)
+        const total = products.length ? produtctsValuesTotal.reduce((total, num) => total + num) : 0
         const totalString = total.toLocaleString("pt-br", {
             style: "currency",
             currency: "BRL",
