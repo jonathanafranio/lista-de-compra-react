@@ -148,7 +148,6 @@ const ListaProdutos = (props) => {
             <IncludeItem hasProd={ hasProduct } />
             <hr />
 
-            { /*showOrder ? (<OrderSelect order={order} changeSelect={ setOrder } />) : (<></>) */ }
             { showOrder ? (<OrderSelect order={order} changeSelect={ changeOrder } />) : false }
 
             <ul className="list mx-12">
@@ -209,7 +208,7 @@ const ListaProdutos = (props) => {
             </footer>
             { duplicidade ? (
                 <ModalDuplicidade duplicidade={ duplicidade } alterQtd={ fecharModalDuplicidade } remove={ removeProduct } />
-            ) : (<></>)
+            ) : false
             }
         </>
     )
