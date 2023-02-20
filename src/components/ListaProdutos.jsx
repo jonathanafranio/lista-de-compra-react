@@ -13,6 +13,8 @@ const ListaProdutos = (props) => {
     const [showOrder, setShowOrder] = useState(false)
     const [order, setOrder] = useState("default")
 
+    const productsStorage = (new_value) => localStorage.setItem('productsList', JSON.stringify(new_value));
+
     const changeTotalValue = () => {
         const produtctsValuesTotal = products.map( p => +p.valortotal )
         const total = products.length ? produtctsValuesTotal.reduce((total, num) => total + num) : 0
@@ -60,7 +62,7 @@ const ListaProdutos = (props) => {
 
         const product_list = products.concat(newProd)
         setProducts(product_list)
-        localStorage.setItem( 'productsList', JSON.stringify(product_list) );
+        productsStorage(product_list)
     }
 
     const changeOrder = (newOrder) => {
@@ -121,7 +123,7 @@ const ListaProdutos = (props) => {
         
         setProducts( productArray )
         changeTotalValue()
-        localStorage.setItem('productsList', JSON.stringify(productArray));
+        productsStorage(productArray)
     }
 
     const removeProduct = (id) => {
@@ -129,7 +131,7 @@ const ListaProdutos = (props) => {
         const newList = products.filter( (p) => p.id !== id )
         setProducts( newList )
 
-        newList.length ? localStorage.setItem('productsList', JSON.stringify(newList)) : localStorage.clear();
+        newList.length ? productsStorage(newList) : localStorage.clear();
         setDuplicidade(null)
     }
 
@@ -148,7 +150,7 @@ const ListaProdutos = (props) => {
                 console.log(alter_products[currentArray])
             setProducts(alter_products)
 
-            alter_products.length ? localStorage.setItem('productsList', JSON.stringify(alter_products)) : localStorage.clear();
+            alter_products.length ? productsStorage(alter_products) : localStorage.clear();
 
             changeTotalValue()
         }
