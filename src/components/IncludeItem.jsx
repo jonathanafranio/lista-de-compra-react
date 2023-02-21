@@ -83,6 +83,7 @@ const IncludeItem = (props) => {
             quantidade: +quantidade,
             preco: 0,
             valortotal: 0,
+            pego: false,
         }
 
         callback( prodAdd )

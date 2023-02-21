@@ -112,7 +112,6 @@ const ListaProdutos = (props) => {
         if(!newPrice) return
         if(!idProd) return
 
-        
         let productArray = products
         const thisIndex = productArray.findIndex((prod) => prod.id === idProd)
         let precoUnitario = +newPrice.toString().replace(',', '.')
@@ -157,6 +156,16 @@ const ListaProdutos = (props) => {
         setDuplicidade(null)
     }
 
+    const changePego = (idProd, bool_val) => {
+        console.log(`Foi pego ${idProd}? ${bool_val}`)
+        if(!idProd) return
+        let productArray = products
+        const thisIndex = productArray.findIndex((prod) => prod.id == idProd)
+        productArray[thisIndex].pego = bool_val
+        setProducts( productArray )
+        productsStorage( productArray )
+        console.log({ thisIndex, productArray, products })
+    }
 
     return (
         <>
@@ -190,8 +199,8 @@ const ListaProdutos = (props) => {
                 ) }
                 
 
-                { products.map( (product, index ) => (
-                    <Product product={ product } removeProduct={ removeProduct } incluirPreco={ incluirPreco } />
+                { products.map( (product) => (
+                    <Product product={ product } removeProduct={ removeProduct } incluirPreco={ incluirPreco } checked={ changePego } />
                 ) ) }
 
             </ul>

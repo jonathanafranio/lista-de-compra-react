@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const Product = (props) => {
-    const { product, removeProduct, incluirPreco } = props
+    const { product, removeProduct, incluirPreco, checked } = props
 
     const [price, setPrice] = useState(product.preco ?? 0)
 
@@ -17,7 +17,12 @@ const Product = (props) => {
 
     return(
         <li className="list__prod" id={`product-${product.id}`} key={product.id}>
-            <input type="checkbox" className="list__checkbox" id={product.id} />
+            <input 
+                type="checkbox" 
+                className="list__checkbox" 
+                id={product.id} 
+                defaultChecked={ product.pego }
+                onChange={ e => checked(product.id, e.target.checked) } />
             <label className="list__name-prod list__label-prod mx-4 sm-5 ph-2" htmlFor={product.id}>
                 { product.nome }
             </label>
