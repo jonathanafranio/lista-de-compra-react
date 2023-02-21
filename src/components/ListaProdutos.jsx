@@ -164,8 +164,7 @@ const ListaProdutos = (props) => {
         const thisIndex = productArray.findIndex( (prod) => prod.id === +idProd )
         productArray[thisIndex].pego = bool_val
         //setProducts( orderPego(productArray) )
-        console.log(order, productArray)
-        reviewOrder( order, productArray )
+        reviewOrder(order, productArray)
         productsStorage( productArray )
     }
 
