@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { connect } from "react-redux"
 import IncludeItem from './IncludeItem'
 import ModalDuplicidade from './ModalDuplicidade'
 import OrderSelect from './OrderSelect'
 import Product from "./Product"
 
-const all_products = localStorage.getItem('productsList') ? JSON.parse( localStorage.getItem('productsList') ) : []
 const orderPego = (arr) => arr.sort( (a, b) => a.pego - b.pego )
 
 const ListaProdutos = (props) => {
-    const [products, setProducts] = useState( orderPego( all_products ) )
+    const [products, setProducts] = useState( orderPego( props.products ) )
     const [totalvalor, setTotalvalor] = useState( 'R$0,00' )
     const [duplicidade, setDuplicidade] = useState(null)
     const [showOrder, setShowOrder] = useState(false)
@@ -67,39 +67,6 @@ const ListaProdutos = (props) => {
         }
         const return_prod = funcOrder(productsList).sort( (a, b) => a.pego - b.pego )
         setProducts( orderPego( return_prod ) )
-    }
-
-    const hasProduct = (obj_prod) => {
-        if(!obj_prod) return
-
-        const nameNewProd = obj_prod.nome.toLowerCase()
-        const hastThisProd = products.findIndex((prod) => prod.nome.toLowerCase() === nameNewProd)
-
-        if (hastThisProd < 0) {
-            addProduct( obj_prod )
-
-        } else {
-            const obj_duplicidade = {
-                currentArray: hastThisProd,
-                prodNome: products[hastThisProd].nome,
-                prodQtd: +products[hastThisProd].quantidade
-            }
-            setDuplicidade( obj_duplicidade )
-            navigator.vibrate(400);
-        }
-    }
-
-    const addProduct = (newProd) => {
-        if( ! newProd ) return
-        const id_maior = products.length ? products.map(p => p.id).reduce((a,b) => Math.max(a, b)) : 0
-        const id_prod = id_maior + 1
-        
-        newProd.id = id_prod
-
-        const product_list = products.concat(newProd)
-        //setProducts( orderPego(product_list) )
-        reviewOrder( order, product_list )
-        productsStorage(product_list)
     }
 
     const changeOrder = (newOrder) => {
@@ -170,7 +137,7 @@ const ListaProdutos = (props) => {
 
     return (
         <>
-            <IncludeItem hasProd={ hasProduct } />
+            <IncludeItem showDuplicidade={ setDuplicidade } />
             <hr />
 
             { showOrder ? (<OrderSelect order={order} changeSelect={ changeOrder } />) : false }
@@ -217,4 +184,6 @@ const ListaProdutos = (props) => {
 
 }
 
-export default ListaProdutos
+const mapStateToProps = (state) => state.products
+
+export default connect( mapStateToProps )(ListaProdutos)

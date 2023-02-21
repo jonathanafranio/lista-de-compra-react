@@ -1,4 +1,8 @@
 import React, { useState } from "react"
+import { connect } from "react-redux"
+
+import { addProduct } from '../store/actions/products'
+
 const listProdutcts = [
     "Absorvente",
     "Água oxigenada",
@@ -69,25 +73,40 @@ const listProdutcts = [
     "Tempero",
 ]
 const IncludeItem = (props) => {
+    const { products, addProd, showDuplicidade } = props
     const [ nome, setNome ] = useState("")
     const [ quantidade, setQuantidade ] = useState(1)
 
-    const callback = props.hasProd
-
-    const addProduct = (e) => {
+    const actionSubmit = ( e ) => {
         e.preventDefault()
         if( nome.trim() === "" ) return
 
-        const prodAdd = {
-            nome: nome,
-            quantidade: +quantidade,
-            preco: 0,
-            valortotal: 0,
-            pego: false,
+        const nameNewProd = nome.toLowerCase()
+        const hastThisProd = products.findIndex((prod) => prod.nome.toLowerCase() === nameNewProd)
+
+        if( hastThisProd < 0 ) {
+            const id_maior = products.length ? products.map(p => p.id).reduce((a,b) => Math.max(a, b)) : 0
+            
+            const prodAdd = {
+                id: id_maior + 1,
+                nome: nome,
+                quantidade: +quantidade,
+                preco: 0,
+                valortotal: 0,
+                pego: false,
+            }
+            //console.log( { hastThisProd, id_maior, prodAdd } )
+            addProd(prodAdd, products)
+
+        } else {
+            const obj_duplicidade = {
+                currentArray: hastThisProd,
+                prodNome: products[hastThisProd].nome,
+                prodQtd: +products[hastThisProd].quantidade
+            }
+            navigator.vibrate(400)
+            showDuplicidade( obj_duplicidade )
         }
-
-        callback( prodAdd )
-
         setNome('')
         setQuantidade(1)
     }
@@ -97,7 +116,7 @@ const IncludeItem = (props) => {
             <header className="header">
                 <h1>Lista de compras</h1>
             </header>
-            <form className="form-include" onSubmit={ addProduct }>
+            <form className="form-include" onSubmit={ actionSubmit }>
                 <div className="mx-6 sm-4 ph-2 form-include__box">
                     <label className="form-include__label" htmlFor="item-name">Item:</label>
                     <input type="text" id="item-name" name="item-name" value={ nome } onChange={ e => setNome(e.target.value) } placeholder="Ex.: Sabonete" required list="produtos" />
@@ -120,4 +139,15 @@ const IncludeItem = (props) => {
 
 }
 
-export default IncludeItem
+const mapStateToProps = (state) => state.products
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addProd(obj_newProd, products) {
+            const action = addProduct(obj_newProd, products)
+            dispatch( action )
+        }
+    }
+}
+
+export default connect( mapStateToProps, mapDispatchToProps )(IncludeItem)
