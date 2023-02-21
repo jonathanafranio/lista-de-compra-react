@@ -5,9 +5,10 @@ import OrderSelect from './OrderSelect'
 import Product from "./Product"
 
 const all_products = localStorage.getItem('productsList') ? JSON.parse( localStorage.getItem('productsList') ) : []
+const orderPego = (arr) => arr.sort( (a, b) => a.pego - b.pego )
 
 const ListaProdutos = (props) => {
-    const [products, setProducts] = useState( all_products )
+    const [products, setProducts] = useState( orderPego( all_products ) )
     const [totalvalor, setTotalvalor] = useState( 'R$0,00' )
     const [duplicidade, setDuplicidade] = useState(null)
     const [showOrder, setShowOrder] = useState(false)
@@ -22,17 +23,52 @@ const ListaProdutos = (props) => {
             style: "currency",
             currency: "BRL",
         })
-
         setTotalvalor(totalString)
     }
 
     useEffect(() => {
         products.length > 1 ? setShowOrder(true) : setShowOrder(false)
-
         changeTotalValue()
         // eslint-disable-next-line 
     }, [products])
     
+    const reviewOrder = (order_by, productsList) => {
+        const orderDefault = (arrProd) => arrProd.sort((a, b) => a.id - b.id);
+        const orderByNameAsc = (arrProd)  => {
+            const prodNameAsc = arrProd.sort((a, b) => {
+                const nameA = a.nome.toLowerCase();
+                const nameB = b.nome.toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+            return prodNameAsc;
+        }
+        const orderByNameDesc = (arrProd) => orderByNameAsc(arrProd).reverse();
+        const orderBypriceAsc = (arrProd) => arrProd.sort((a, b) => a.preco - b.preco);
+        const orderBypriceDesc = (arrProd) => orderBypriceAsc(arrProd).reverse();
+        const orderByQtdAsc = (arrProd) => arrProd.sort((a, b) => a.quantidade - b.quantidade);
+        const orderByQtdDesc = (arrProd) => orderByQtdAsc(arrProd).reverse();
+        const funcOrder = (arrProd) => {
+            switch (order_by) {
+                case "nameAsc":
+                    return orderByNameAsc(arrProd);
+                case "nameDesc":
+                    return orderByNameDesc(arrProd);
+                case "priceAsc":
+                    return orderBypriceAsc(arrProd);
+                case "priceDesc":
+                    return orderBypriceDesc(arrProd);
+                case "qtdAsc":
+                    return orderByQtdAsc(arrProd);
+                case "qtdDesc":
+                    return orderByQtdDesc(arrProd);
+                default:
+                    return orderDefault(arrProd);
+            }
+        }
+        const return_prod = funcOrder(productsList).sort( (a, b) => a.pego - b.pego )
+        setProducts( orderPego( return_prod ) )
+    }
+
     const hasProduct = (obj_prod) => {
         if(!obj_prod) return
 
@@ -61,51 +97,15 @@ const ListaProdutos = (props) => {
         newProd.id = id_prod
 
         const product_list = products.concat(newProd)
-        setProducts(product_list)
+        //setProducts( orderPego(product_list) )
+        reviewOrder( order, product_list )
         productsStorage(product_list)
     }
 
     const changeOrder = (newOrder) => {
         if(!newOrder) return
-        
         setOrder(newOrder)
-
-        const orderDefault = (arrProd) => arrProd.sort((a, b) => a.id - b.id);
-        const orderByNameAsc = (arrProd)  => {
-            const prodNameAsc = arrProd.sort((a, b) => {
-                const nameA = a.nome.toLowerCase();
-                const nameB = b.nome.toLowerCase();
-                return nameA.localeCompare(nameB);
-            });
-            return prodNameAsc;
-        }
-        const orderByNameDesc = (arrProd) => orderByNameAsc(arrProd).reverse();
-        const orderBypriceAsc = (arrProd) => arrProd.sort((a, b) => a.preco - b.preco);
-        const orderBypriceDesc = (arrProd) => orderBypriceAsc(arrProd).reverse();
-        const orderByQtdAsc = (arrProd) => arrProd.sort((a, b) => a.quantidade - b.quantidade);
-        const orderByQtdDesc = (arrProd) => orderByQtdAsc(arrProd).reverse();
-        const funcOrder = (arrProd) => {
-            switch (newOrder) {
-                case "nameAsc":
-                    return orderByNameAsc(arrProd);
-                case "nameDesc":
-                    return orderByNameDesc(arrProd);
-                case "priceAsc":
-                    return orderBypriceAsc(arrProd);
-                case "priceDesc":
-                    return orderBypriceDesc(arrProd);
-                case "qtdAsc":
-                    return orderByQtdAsc(arrProd);
-                case "qtdDesc":
-                    return orderByQtdDesc(arrProd);
-                default:
-                    return orderDefault(arrProd);
-            }
-        }
-        
-        const return_prod = funcOrder(products);
-
-        setProducts( return_prod )
+        reviewOrder(newOrder, products)
     }
 
     const incluirPreco = (idProd, newPrice) => {
@@ -120,7 +120,8 @@ const ListaProdutos = (props) => {
         productArray[thisIndex].preco = precoUnitario;
         productArray[thisIndex].valortotal = +precoTotal;
         
-        setProducts( productArray )
+        //setProducts( orderPego(productArray) )
+        reviewOrder( order, productArray )
         changeTotalValue()
         productsStorage(productArray)
     }
@@ -128,7 +129,8 @@ const ListaProdutos = (props) => {
     const removeProduct = (id) => {
         if(!id) return
         const newList = products.filter( (p) => p.id !== id )
-        setProducts( newList )
+        //setProducts( orderPego(newList) )
+        reviewOrder( order, newList )
 
         newList.length ? productsStorage(newList) : localStorage.clear();
         setDuplicidade(null)
@@ -146,8 +148,8 @@ const ListaProdutos = (props) => {
                 alter_products[currentArray].quantidade = newQtd
                 alter_products[currentArray].valortotal = precoTotal
 
-                console.log(alter_products[currentArray])
-            setProducts(alter_products)
+            //setProducts( orderPego(alter_products) )
+            reviewOrder( order, alter_products )
 
             alter_products.length ? productsStorage(alter_products) : localStorage.clear();
 
@@ -157,14 +159,14 @@ const ListaProdutos = (props) => {
     }
 
     const changePego = (idProd, bool_val) => {
-        console.log(`Foi pego ${idProd}? ${bool_val}`)
         if(!idProd) return
         let productArray = products
-        const thisIndex = productArray.findIndex((prod) => prod.id == idProd)
+        const thisIndex = productArray.findIndex( (prod) => prod.id === +idProd )
         productArray[thisIndex].pego = bool_val
-        setProducts( productArray )
+        //setProducts( orderPego(productArray) )
+        console.log(order, productArray)
+        reviewOrder( order, productArray )
         productsStorage( productArray )
-        console.log({ thisIndex, productArray, products })
     }
 
     return (
