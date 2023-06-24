@@ -168,7 +168,7 @@ const ListaProdutos = (props) => {
                 
 
                 { products.map( (product) => (
-                    <Product product={ product } removeProduct={ removeProduct } incluirPreco={ incluirPreco } checked={ changePego } />
+                    <Product key={ product.id } product={ product } removeProduct={ removeProduct } incluirPreco={ incluirPreco } checked={ changePego } />
                 ) ) }
 
             </ul>
